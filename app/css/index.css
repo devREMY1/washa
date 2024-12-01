@@ -3,6 +3,8 @@
 body {
   margin: 0;
   background-color: #bae1e4;
+  overflow-x: hidden;
+  touch-action: manipulation;
 }
 
 .header-section__link {
