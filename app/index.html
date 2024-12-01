@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="theme-color" content="#000000" />
+		<link rel="manifest" href="manifest.json" />
+		<title>Мобильное приложение</title>
+		<style>
+			body {
+				margin: 0;
+				font-family: Arial, sans-serif;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				background-color: #f0f0f0;
+			}
+			h1 {
+				text-align: center;
+				color: #333;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Добро пожаловать в мое приложение!</h1>
+
+		<script>
+			// Регистрация service-worker
+			if ('serviceWorker' in navigator) {
+				navigator.serviceWorker
+					.register('/service-worker.js')
+					.then(() => {
+						console.log('Service Worker зарегистрирован');
+					})
+					.catch(err => {
+						console.error('Ошибка регистрации Service Worker:', err);
+					});
+			}
+		</script>
+		<script>
+			if (!/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+				document.body.innerHTML =
+					'<h1>Доступно только для мобильных устройств</h1>';
+			}
+		</script>
+	</body>
+</html>
