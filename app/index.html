@@ -8,82 +8,55 @@
 		<link rel="apple-touch-icon" href="./icon/192.png" />
 		<link rel="apple-touch-icon" href="./icon/512.png" />
 		<link rel="icon" href="./icon/512.png" />
-		<title>Мобильное приложение</title>
-		<style>
-			body {
-				margin: 0;
-				font-family: Arial, sans-serif;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				height: 100vh;
-				background-color: #f0f0f0;
-			}
-			h1 {
-				text-align: center;
-				color: #333;
-			}
-		</style>
+		<link rel="stylesheet" href="./css/index.css" />
+		<title>washa</title>
 	</head>
 	<body>
-		<h1>Добро пожаловать в мое приложение!</h1>
-
-		<button id="installApp" style="display: none">Установить приложение</button>
-
-		<script>
-			let deferredPrompt;
-
-			// Слушаем событие `beforeinstallprompt`
-			window.addEventListener('beforeinstallprompt', e => {
-				// Останавливаем автоматическое отображение
-				e.preventDefault();
-				deferredPrompt = e;
-				document.getElementById('installApp').style.display = 'block';
-			});
-
-			// Обрабатываем нажатие на кнопку
-			document.getElementById('installApp').addEventListener('click', () => {
-				if (deferredPrompt) {
-					deferredPrompt.prompt();
-					deferredPrompt.userChoice.then(choiceResult => {
-						if (choiceResult.outcome === 'accepted') {
-							console.log('Приложение установлено');
-						} else {
-							console.log('Установка приложения отменена');
-						}
-						deferredPrompt = null;
-					});
-				}
-			});
-		</script>
-		<script>
-			// Регистрация service-worker
-			if ('serviceWorker' in navigator) {
-				navigator.serviceWorker
-					.register('./service-worker.js')
-					.then(registration => {
-						console.log('Service Worker зарегистрирован: ', registration);
-					})
-					.catch(error => {
-						console.error('Ошибка регистрации Service Worker: ', error);
-					});
-			}
-		</script>
-		<script>
-			// Проверяем устройство и показываем кнопку для Android
-			if (window.matchMedia('(display-mode: standalone)').matches) {
-				// Приложение уже установлено
-				document.getElementById('installApp').style.display = 'none';
-			} else if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-				// Для мобильных устройств показываем инструкцию
-				document.body.innerHTML += `
-      <p>Для установки на iPhone, нажмите на иконку в верхнем углу браузера и выберите "Добавить на главный экран".</p>
-    `;
-			} else {
-				// Для ПК показываем только сообщение
-				document.body.innerHTML =
-					'<h1>Доступно только для мобильных устройств</h1>';
-			}
-		</script>
+		<div class="wrapper">
+			<header class="header-section">
+				<a href="#" class="header-section__link"
+					><img src="./icon/washa-logo.svg" alt="washa"
+				/></a>
+			</header>
+			<nav class="nav-section">
+				<ol class="nav-section__list">
+					<li class="nav-section__list-item">
+						<a href="#" class="nav-section__list-item-link"
+							><img
+								src="./icon/payment.svg"
+								alt="кошик та оплата"
+								class="nav-section__list-item-link-img"
+						/></a>
+					</li>
+					<li class="nav-section__list-item">
+						<a href="#" class="nav-section__list-item-link"
+							><img
+								src="./icon/like.svg"
+								alt="вподобання"
+								class="nav-section__list-item-link-img"
+						/></a>
+					</li>
+					<li class="nav-section__list-item">
+						<a href="#" class="nav-section__list-item-link"
+							><img
+								src="./icon/general.svg"
+								alt="головна"
+								class="nav-section__list-item-link-img"
+						/></a>
+					</li>
+				</ol>
+				<div class="nav-section__search">
+					<input
+						class="nav-section__search-input"
+						type="text"
+						id="search-input"
+					/>
+					<button class="nav-section__search-btn" id="search-btn">
+						<img src="./icon/search.svg" alt="пошук" />
+					</button>
+				</div>
+			</nav>
+		</div>
+		<script src="./js/script.js"></script>
 	</body>
 </html>
