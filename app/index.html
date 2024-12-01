@@ -69,7 +69,17 @@
 			}
 		</script>
 		<script>
-			if (!/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+			// Проверяем устройство и показываем кнопку для Android
+			if (window.matchMedia('(display-mode: standalone)').matches) {
+				// Приложение уже установлено
+				document.getElementById('installApp').style.display = 'none';
+			} else if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+				// Для мобильных устройств показываем инструкцию
+				document.body.innerHTML += `
+      <p>Для установки на iPhone, нажмите на иконку в верхнем углу браузера и выберите "Добавить на главный экран".</p>
+    `;
+			} else {
+				// Для ПК показываем только сообщение
 				document.body.innerHTML =
 					'<h1>Доступно только для мобильных устройств</h1>';
 			}
