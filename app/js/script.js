@@ -39,11 +39,6 @@ if ('serviceWorker' in navigator) {
 if (window.matchMedia('(display-mode: standalone)').matches) {
 	// Приложение уже установлено
 	document.getElementById('installApp').style.display = 'none';
-} else if (/Mobi|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-	// Для мобильных устройств показываем инструкцию
-	document.body.innerHTML += `
-      <p>Для встановлення додатку на iPhone! натисніть на іконку "поділитися" в вашому браузері та натисніть "Додати на головний екран".</p>
-    `;
 } else {
 	// Для ПК показываем только сообщение
 	document.body.innerHTML = '<h1>Доступно тільки для мобільних пристроїв</h1>';
