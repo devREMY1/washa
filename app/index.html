@@ -5,6 +5,8 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="theme-color" content="#000000" />
 		<link rel="manifest" href="manifest.json" />
+		<link rel="apple-touch-icon" href="./icon/192.png" />
+		<link rel="apple-touch-icon" href="./icon/512.png" />
 		<title>Мобильное приложение</title>
 		<style>
 			body {
@@ -25,6 +27,34 @@
 	<body>
 		<h1>Добро пожаловать в мое приложение!</h1>
 
+		<button id="installApp" style="display: none">Установить приложение</button>
+
+		<script>
+			let deferredPrompt;
+
+			// Слушаем событие `beforeinstallprompt`
+			window.addEventListener('beforeinstallprompt', e => {
+				// Останавливаем автоматическое отображение
+				e.preventDefault();
+				deferredPrompt = e;
+				document.getElementById('installApp').style.display = 'block';
+			});
+
+			// Обрабатываем нажатие на кнопку
+			document.getElementById('installApp').addEventListener('click', () => {
+				if (deferredPrompt) {
+					deferredPrompt.prompt();
+					deferredPrompt.userChoice.then(choiceResult => {
+						if (choiceResult.outcome === 'accepted') {
+							console.log('Приложение установлено');
+						} else {
+							console.log('Установка приложения отменена');
+						}
+						deferredPrompt = null;
+					});
+				}
+			});
+		</script>
 		<script>
 			// Регистрация service-worker
 			if ('serviceWorker' in navigator) {
