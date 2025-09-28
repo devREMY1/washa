@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Монополия - Банковское приложение</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				min-height: 100vh;
+				color: white;
+			}
+
+			.container {
+				max-width: 400px;
+				margin: 0 auto;
+				padding: 10px;
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.header {
+				text-align: center;
+				margin-bottom: 20px;
+				background: rgba(255, 255, 255, 0.1);
+				backdrop-filter: blur(10px);
+				border-radius: 15px;
+				padding: 15px;
+				border: 1px solid rgba(255, 255, 255, 0.2);
+			}
+
+			.header h1 {
+				font-size: 1.5rem;
+				margin-bottom: 8px;
+				color: #fff;
+			}
+
+			.user-info {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 10px;
+				font-size: 0.9rem;
+				background: rgba(255, 255, 255, 0.1);
+				padding: 8px 12px;
+				border-radius: 10px;
+			}
+
+			.role-selection {
+				display: flex;
+				gap: 10px;
+				margin-bottom: 15px;
+			}
+
+			.role-btn {
+				flex: 1;
+				padding: 12px;
+				border: none;
+				border-radius: 12px;
+				background: rgba(255, 255, 255, 0.2);
+				color: white;
+				font-size: 1rem;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				backdrop-filter: blur(10px);
+				border: 2px solid transparent;
+			}
+
+			.role-btn:hover {
+				background: rgba(255, 255, 255, 0.3);
+				transform: translateY(-1px);
+			}
+
+			.role-btn.active {
+				background: rgba(255, 255, 255, 0.4);
+				border-color: rgba(255, 255, 255, 0.6);
+			}
+
+			.game-section {
+				background: rgba(255, 255, 255, 0.1);
+				backdrop-filter: blur(10px);
+				border-radius: 15px;
+				padding: 15px;
+				margin-bottom: 15px;
+				border: 1px solid rgba(255, 255, 255, 0.2);
+			}
+
+			.balance-display {
+				text-align: center;
+				font-size: 2rem;
+				font-weight: bold;
+				margin: 15px 0;
+				color: #4ade80;
+				text-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+				background: rgba(74, 222, 128, 0.1);
+				padding: 15px;
+				border-radius: 12px;
+			}
+
+			.turn-counter {
+				text-align: center;
+				font-size: 1.1rem;
+				margin-bottom: 15px;
+				color: #fbbf24;
+				background: rgba(251, 191, 36, 0.1);
+				padding: 8px;
+				border-radius: 8px;
+			}
+
+			.input-group {
+				margin-bottom: 15px;
+			}
+
+			.input-group label {
+				display: block;
+				margin-bottom: 6px;
+				font-weight: 500;
+				font-size: 0.9rem;
+			}
+
+			.input-group input,
+			.input-group select {
+				width: 100%;
+				padding: 12px;
+				border: none;
+				border-radius: 8px;
+				background: rgba(255, 255, 255, 0.9);
+				color: #333;
+				font-size: 1rem;
+				box-sizing: border-box;
+			}
+
+			.input-group input:focus,
+			.input-group select:focus {
+				outline: none;
+				background: white;
+				box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.5);
+			}
+
+			.btn {
+				width: 100%;
+				padding: 14px;
+				border: none;
+				border-radius: 12px;
+				background: linear-gradient(45deg, #10b981, #059669);
+				color: white;
+				font-size: 1rem;
+				font-weight: 600;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				margin-bottom: 8px;
+				box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+				touch-action: manipulation;
+			}
+
+			.btn:hover,
+			.btn:active {
+				transform: translateY(-1px);
+				box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+			}
+
+			.btn:disabled {
+				opacity: 0.6;
+				cursor: not-allowed;
+				transform: none;
+			}
+
+			.btn.danger {
+				background: linear-gradient(45deg, #ef4444, #dc2626);
+				box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+			}
+
+			.btn.secondary {
+				background: linear-gradient(45deg, #6b7280, #4b5563);
+				box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
+			}
+
+			.btn.small {
+				padding: 8px 12px;
+				font-size: 0.85rem;
+				margin-bottom: 5px;
+			}
+
+			.qr-container {
+				text-align: center;
+				margin: 15px 0;
+			}
+
+			.players-list {
+				max-height: 180px;
+				overflow-y: auto;
+				background: rgba(255, 255, 255, 0.05);
+				border-radius: 8px;
+				padding: 10px;
+			}
+
+			.player-item {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 8px 0;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+				font-size: 0.9rem;
+			}
+
+			.player-item:last-child {
+				border-bottom: none;
+			}
+
+			.status-message {
+				text-align: center;
+				padding: 12px;
+				margin: 8px 0;
+				border-radius: 8px;
+				font-weight: 500;
+				font-size: 0.9rem;
+			}
+
+			.status-success {
+				background: rgba(16, 185, 129, 0.2);
+				border: 1px solid rgba(16, 185, 129, 0.5);
+				color: #10b981;
+			}
+
+			.status-error {
+				background: rgba(239, 68, 68, 0.2);
+				border: 1px solid rgba(239, 68, 68, 0.5);
+				color: #ef4444;
+			}
+
+			.status-info {
+				background: rgba(59, 130, 246, 0.2);
+				border: 1px solid rgba(59, 130, 246, 0.5);
+				color: #3b82f6;
+			}
+
+			.hidden {
+				display: none !important;
+			}
+
+			.transaction-history {
+				max-height: 120px;
+				overflow-y: auto;
+				background: rgba(255, 255, 255, 0.05);
+				border-radius: 8px;
+				padding: 10px;
+				margin-top: 15px;
+			}
+
+			.transaction-item {
+				display: flex;
+				justify-content: space-between;
+				padding: 6px 0;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+				font-size: 0.85rem;
+			}
+
+			.transaction-item:last-child {
+				border-bottom: none;
+			}
+
+			.amount-positive {
+				color: #4ade80;
+				font-weight: 600;
+			}
+
+			.amount-negative {
+				color: #f87171;
+				font-weight: 600;
+			}
+
+			.modal {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.8);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				z-index: 1000;
+				padding: 20px;
+			}
+
+			.modal-content {
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+				padding: 20px;
+				border-radius: 15px;
+				max-width: 320px;
+				width: 100%;
+				text-align: center;
+			}
+
+			.transaction-id-display {
+				background: white;
+				color: black;
+				padding: 15px;
+				border-radius: 8px;
+				text-align: center;
+				margin: 8px 0;
+			}
+
+			.transaction-code {
+				font-family: 'Courier New', monospace;
+				font-size: 1.8rem;
+				font-weight: bold;
+				letter-spacing: 3px;
+				margin: 12px 0;
+				padding: 12px;
+				background: #f0f0f0;
+				border-radius: 8px;
+				border: 2px dashed #666;
+				color: #333;
+			}
+
+			.copy-btn {
+				background: #007bff;
+				color: white;
+				border: none;
+				padding: 8px 16px;
+				border-radius: 6px;
+				cursor: pointer;
+				margin: 5px;
+				font-size: 0.85rem;
+				touch-action: manipulation;
+			}
+
+			.copy-btn:hover,
+			.copy-btn:active {
+				background: #0056b3;
+			}
+
+			.refresh-btn {
+				background: rgba(255, 255, 255, 0.2);
+				border: 1px solid rgba(255, 255, 255, 0.3);
+				color: white;
+				padding: 6px 10px;
+				border-radius: 6px;
+				cursor: pointer;
+				font-size: 0.8rem;
+				touch-action: manipulation;
+			}
+
+			.refresh-btn:hover,
+			.refresh-btn:active {
+				background: rgba(255, 255, 255, 0.3);
+			}
+
+			.auth-section {
+				background: rgba(255, 255, 255, 0.1);
+				border-radius: 15px;
+				padding: 20px;
+				margin-bottom: 15px;
+				text-align: center;
+			}
+
+			.quick-amounts {
+				display: grid;
+				grid-template-columns: 1fr 1fr 1fr;
+				gap: 8px;
+				margin-bottom: 15px;
+			}
+
+			.amount-btn {
+				padding: 8px;
+				background: rgba(255, 255, 255, 0.2);
+				border: 1px solid rgba(255, 255, 255, 0.3);
+				color: white;
+				border-radius: 8px;
+				cursor: pointer;
+				font-size: 0.9rem;
+				touch-action: manipulation;
+			}
+
+			.amount-btn:hover,
+			.amount-btn:active {
+				background: rgba(255, 255, 255, 0.3);
+			}
+
+			.amount-btn.selected {
+				background: rgba(16, 185, 129, 0.6);
+				border-color: rgba(16, 185, 129, 0.8);
+			}
+
+			/* Mobile optimizations */
+			@media (max-width: 480px) {
+				.container {
+					padding: 8px;
+				}
+
+				.header h1 {
+					font-size: 1.3rem;
+				}
+
+				.balance-display {
+					font-size: 1.8rem;
+				}
+
+				.transaction-code {
+					font-size: 1.5rem;
+					letter-spacing: 2px;
+				}
+
+				.btn {
+					padding: 12px;
+					font-size: 0.95rem;
+				}
+
+				.input-group input,
+				.input-group select {
+					padding: 10px;
+					font-size: 16px; /* Prevents zoom on iOS */
+				}
+			}
+
+			/* Landscape mobile */
+			@media (max-height: 600px) and (orientation: landscape) {
+				.container {
+					padding: 5px;
+				}
+
+				.balance-display {
+					margin: 10px 0;
+					padding: 10px;
+				}
+
+				.transaction-history {
+					max-height: 80px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<!-- Auth Section -->
+			<div id="authSection" class="auth-section">
+				<h2>🏠 Монополия Банк</h2>
+				<div class="input-group">
+					<label for="playerNameAuth">Введите ваше имя:</label>
+					<input
+						type="text"
+						id="playerNameAuth"
+						placeholder="Имя игрока"
+						maxlength="20"
+					/>
+				</div>
+				<button class="btn" id="loginBtn">Войти в игру</button>
+			</div>
+
+			<!-- Main App -->
+			<div id="mainApp" class="hidden">
+				<div class="header">
+					<div class="user-info">
+						<span>Игрок: <strong id="currentPlayerName"></strong></span>
+						<button class="refresh-btn" id="refreshBtn" title="Обновить данные">
+							🔄
+						</button>
+					</div>
+
+					<div class="role-selection">
+						<button class="role-btn" id="bankerBtn">🏦 Банкир</button>
+						<button class="role-btn" id="playerBtn">👤 Игрок</button>
+					</div>
+				</div>
+
+				<!-- Banker Section -->
+				<div id="bankerSection" class="game-section hidden">
+					<h3>🏦 Панель Банкира</h3>
+
+					<div class="input-group">
+						<label for="gameId">ID Игры:</label>
+						<input
+							type="text"
+							id="gameId"
+							placeholder="ID игры"
+							value="GAME1"
+						/>
+					</div>
+
+					<button class="btn" id="createGameBtn">
+						Создать/Подключить игру
+					</button>
+
+					<div id="gameControls" class="hidden">
+						<div class="turn-counter">
+							🎯 Ход: <span id="currentTurn">1</span>
+						</div>
+
+						<button class="btn secondary small" id="nextTurnBtn">
+							Следующий ход
+						</button>
+
+						<div class="input-group">
+							<label for="playerSelect">Игрок:</label>
+							<select id="playerSelect">
+								<option value="">Выберите игрока...</option>
+							</select>
+						</div>
+
+						<div class="quick-amounts">
+							<button class="amount-btn" onclick="selectAmount(50)">50₴</button>
+							<button class="amount-btn" onclick="selectAmount(100)">
+								100₴
+							</button>
+							<button class="amount-btn" onclick="selectAmount(200)">
+								200₴
+							</button>
+							<button class="amount-btn" onclick="selectAmount(500)">
+								500₴
+							</button>
+							<button class="amount-btn" onclick="selectAmount(1000)">
+								1000₴
+							</button>
+							<button class="amount-btn" onclick="selectAmount(0)">
+								Другое
+							</button>
+						</div>
+
+						<div class="input-group">
+							<label for="transactionAmount">Сумма:</label>
+							<input
+								type="number"
+								id="transactionAmount"
+								placeholder="0"
+								step="10"
+							/>
+						</div>
+
+						<div class="input-group">
+							<label for="transactionType">Операция:</label>
+							<select id="transactionType">
+								<option value="debit">Списать 💸</option>
+								<option value="credit">Начислить 💰</option>
+							</select>
+						</div>
+
+						<div class="input-group">
+							<label for="transactionReason">Причина:</label>
+							<input
+								type="text"
+								id="transactionReason"
+								placeholder="Налог, покупка, зарплата..."
+							/>
+						</div>
+
+						<button class="btn" id="createTransactionBtn">Создать код</button>
+
+						<div id="qrResult" class="qr-container hidden">
+							<h4>Код транзакции:</h4>
+							<div id="qrCodeContainer"></div>
+						</div>
+
+						<div class="players-list">
+							<h4>💰 Игроки:</h4>
+							<div id="playersList"></div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Player Section -->
+				<div id="playerSection" class="game-section hidden">
+					<h3>👤 Панель Игрока</h3>
+
+					<div class="input-group">
+						<label for="playerGameId">ID Игры:</label>
+						<input
+							type="text"
+							id="playerGameId"
+							placeholder="ID игры"
+							value="GAME1"
+						/>
+					</div>
+
+					<button class="btn" id="joinGameBtn">Присоединиться</button>
+
+					<div id="playerControls" class="hidden">
+						<div class="balance-display">
+							💰 <span id="playerBalance">1500</span>₴
+						</div>
+
+						<div class="turn-counter">
+							🎯 Ход: <span id="playerCurrentTurn">1</span>
+						</div>
+
+						<button class="btn secondary" id="enterCodeBtn">
+							Ввести код транзакции
+						</button>
+
+						<div id="manualCodeContainer" class="input-group hidden">
+							<label for="manualCodeInput">5-значный код:</label>
+							<input
+								type="text"
+								id="manualCodeInput"
+								placeholder="12345"
+								maxlength="5"
+								style="
+									text-align: center;
+									font-size: 1.2rem;
+									letter-spacing: 2px;
+								"
+							/>
+							<button class="btn" id="processCodeBtn">Применить код</button>
+						</div>
+
+						<div class="transaction-history">
+							<h4>📋 История:</h4>
+							<div id="transactionHistory"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="statusMessage"></div>
+		</div>
+
+		<!-- Modal for confirmations -->
+		<div id="confirmModal" class="modal hidden">
+			<div class="modal-content">
+				<h3 id="modalTitle">Подтверждение</h3>
+				<p id="modalMessage"></p>
+				<div id="modalTransactionInfo" class="hidden">
+					<div class="transaction-id-display">
+						<div class="transaction-code" id="modalTransactionCode"></div>
+						<div id="modalTransactionDetails"></div>
+					</div>
+				</div>
+				<div style="margin-top: 15px">
+					<button class="btn" id="confirmBtn">Подтвердить</button>
+					<button class="btn secondary" id="cancelBtn">Отмена</button>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			// Enhanced storage system with user authentication
+			class GameStorage {
+				constructor() {
+					this.data = JSON.parse(localStorage.getItem('monopoly-data') || '{}');
+					this.currentUser = localStorage.getItem('monopoly-current-user');
+					this.listeners = {};
+				}
+
+				setCurrentUser(userName) {
+					this.currentUser = userName;
+					localStorage.setItem('monopoly-current-user', userName);
+
+					// Initialize user data if doesn't exist
+					if (!this.data.users) this.data.users = {};
+					if (!this.data.users[userName]) {
+						this.data.users[userName] = {
+							name: userName,
+							createdAt: new Date().toISOString(),
+							gamesJoined: [],
+						};
+						this.save();
+					}
+				}
+
+				getCurrentUser() {
+					return this.currentUser;
+				}
+
+				collection(name) {
+					if (!this.data[name]) {
+						this.data[name] = {};
+					}
+					return new Collection(name, this);
+				}
+
+				generateShortCode() {
+					// Generate 5-digit code
+					return Math.floor(10000 + Math.random() * 90000).toString();
+				}
+
+				save() {
+					localStorage.setItem('monopoly-data', JSON.stringify(this.data));
+				}
+
+				onSnapshot(path, callback) {
+					if (!this.listeners[path]) {
+						this.listeners[path] = [];
+					}
+					this.listeners[path].push(callback);
+
+					// Call immediately with current data
+					const pathParts = path.split('/');
+					let data = this.data;
+					for (let part of pathParts) {
+						if (data && data[part] !== undefined) {
+							data = data[part];
+						} else {
+							data = null;
+							break;
+						}
+					}
+					callback({ exists: () => !!data, data: () => data });
+
+					return () => {
+						this.listeners[path] = this.listeners[path].filter(
+							cb => cb !== callback
+						);
+					};
+				}
+
+				triggerListeners(path) {
+					if (this.listeners[path]) {
+						const pathParts = path.split('/');
+						let data = this.data;
+						for (let part of pathParts) {
+							if (data && data[part] !== undefined) {
+								data = data[part];
+							} else {
+								data = null;
+								break;
+							}
+						}
+						this.listeners[path].forEach(callback => {
+							callback({ exists: () => !!data, data: () => data });
+						});
+					}
+				}
+			}
+
+			class Collection {
+				constructor(name, storage) {
+					this.name = name;
+					this.storage = storage;
+				}
+
+				doc(id) {
+					return new Document(this.name, id, this.storage);
+				}
+			}
+
+			class Document {
+				constructor(collection, id, storage) {
+					this.collection = collection;
+					this.id = id;
+					this.storage = storage;
+				}
+
+				async get() {
+					const data = this.storage.data[this.collection]?.[this.id];
+					return {
+						exists: !!data,
+						data: () => JSON.parse(JSON.stringify(data)), // return copy
+					};
+				}
+
+				async set(data) {
+					if (!this.storage.data[this.collection]) {
+						this.storage.data[this.collection] = {};
+					}
+					// ensure dates are serialized
+					const payload = {
+						...data,
+						createdAt: data.createdAt || new Date().toISOString(),
+					};
+					this.storage.data[this.collection][this.id] = payload;
+					this.storage.save();
+					this.storage.triggerListeners(`${this.collection}/${this.id}`);
+				}
+
+				async update(data) {
+					if (!this.storage.data[this.collection]) {
+						this.storage.data[this.collection] = {};
+					}
+					if (!this.storage.data[this.collection][this.id]) {
+						this.storage.data[this.collection][this.id] = {};
+					}
+
+					Object.keys(data).forEach(key => {
+						if (key.includes('.')) {
+							// Handle nested updates like "players.userId.balance"
+							const parts = key.split('.');
+							let target = this.storage.data[this.collection][this.id];
+							for (let i = 0; i < parts.length - 1; i++) {
+								if (!target[parts[i]]) {
+									target[parts[i]] = {};
+								}
+								target = target[parts[i]];
+							}
+							target[parts[parts.length - 1]] = data[key];
+						} else {
+							this.storage.data[this.collection][this.id][key] = data[key];
+						}
+					});
+
+					this.storage.save();
+					this.storage.triggerListeners(`${this.collection}/${this.id}`);
+				}
+
+				onSnapshot(callback) {
+					return this.storage.onSnapshot(
+						`${this.collection}/${this.id}`,
+						callback
+					);
+				}
+			}
+
+			// Initialize storage
+			const db = new GameStorage();
+
+			// Global variables
+			let currentGameId = null;
+			let currentRole = null;
+			let unsubscribeGame = null;
+			let lastPreparedTransaction = null; // used for confirmation modal
+
+			// DOM elements
+			const authSection = document.getElementById('authSection');
+			const mainApp = document.getElementById('mainApp');
+			const bankerBtn = document.getElementById('bankerBtn');
+			const playerBtn = document.getElementById('playerBtn');
+			const bankerSection = document.getElementById('bankerSection');
+			const playerSection = document.getElementById('playerSection');
+			const statusMessage = document.getElementById('statusMessage');
+
+			// Initialize app
+			document.addEventListener('DOMContentLoaded', () => {
+				// Check if user is already logged in
+				const currentUser = db.getCurrentUser();
+				if (currentUser) {
+					document.getElementById('currentPlayerName').textContent =
+						currentUser;
+					authSection.classList.add('hidden');
+					mainApp.classList.remove('hidden');
+					showStatus('Добро пожаловать, ' + currentUser + '!', 'success');
+				}
+
+				// Auth
+				document.getElementById('loginBtn').addEventListener('click', login);
+				document
+					.getElementById('playerNameAuth')
+					.addEventListener('keypress', e => {
+						if (e.key === 'Enter') login();
+					});
+
+				// Navigation
+				document
+					.getElementById('refreshBtn')
+					.addEventListener('click', refreshData);
+				bankerBtn.addEventListener('click', () => selectRole('banker'));
+				playerBtn.addEventListener('click', () => selectRole('player'));
+
+				// Banker controls
+				document
+					.getElementById('createGameBtn')
+					.addEventListener('click', createGame);
+				document
+					.getElementById('nextTurnBtn')
+					.addEventListener('click', nextTurn);
+				document
+					.getElementById('createTransactionBtn')
+					.addEventListener('click', createTransaction);
+
+				// Player controls
+				document
+					.getElementById('joinGameBtn')
+					.addEventListener('click', joinGame);
+				document
+					.getElementById('enterCodeBtn')
+					.addEventListener('click', toggleManualCode);
+				document
+					.getElementById('processCodeBtn')
+					.addEventListener('click', processManualCode);
+				document
+					.getElementById('manualCodeInput')
+					.addEventListener('input', formatCodeInput);
+
+				// Modal controls
+				document
+					.getElementById('confirmBtn')
+					.addEventListener('click', confirmTransaction);
+				document
+					.getElementById('cancelBtn')
+					.addEventListener('click', closeModal);
+			});
+
+			function login() {
+				const playerName = document
+					.getElementById('playerNameAuth')
+					.value.trim();
+				if (!playerName) {
+					showStatus('Введите ваше имя', 'error');
+					return;
+				}
+
+				if (playerName.length < 2) {
+					showStatus('Имя должно содержать минимум 2 символа', 'error');
+					return;
+				}
+
+				db.setCurrentUser(playerName);
+				document.getElementById('currentPlayerName').textContent = playerName;
+				authSection.classList.add('hidden');
+				mainApp.classList.remove('hidden');
+				showStatus('Добро пожаловать, ' + playerName + '!', 'success');
+			}
+
+			function refreshData() {
+				if (currentGameId) {
+					// Trigger refresh of game data
+					db.triggerListeners(`games/${currentGameId}`);
+					updatePlayerBalance();
+					updateTransactionHistory();
+					showStatus('Данные обновлены', 'info');
+				} else {
+					showStatus('Сначала подключитесь к игре', 'error');
+				}
+			}
+
+			function selectRole(role) {
+				currentRole = role;
+
+				// Update UI
+				document
+					.querySelectorAll('.role-btn')
+					.forEach(btn => btn.classList.remove('active'));
+				if (role === 'banker') {
+					bankerBtn.classList.add('active');
+					bankerSection.classList.remove('hidden');
+					playerSection.classList.add('hidden');
+				} else {
+					playerBtn.classList.add('active');
+					playerSection.classList.remove('hidden');
+					bankerSection.classList.add('hidden');
+				}
+			}
+
+			function selectAmount(amount) {
+				// try to get event target (works for inline onclick in many browsers)
+				const ev = window.event || null;
+				document
+					.querySelectorAll('.amount-btn')
+					.forEach(btn => btn.classList.remove('selected'));
+				if (ev && ev.target && ev.target.classList.contains('amount-btn')) {
+					ev.target.classList.add('selected');
+				} else {
+					// fallback: select button with matching text
+					const btn = Array.from(document.querySelectorAll('.amount-btn')).find(
+						b =>
+							b.textContent.includes(
+								amount && amount !== 0 ? amount.toString() : 'Другое'
+							)
+					);
+					if (btn) btn.classList.add('selected');
+				}
+
+				// Set amount
+				const amountInput = document.getElementById('transactionAmount');
+				if (amount === 0) {
+					amountInput.value = '';
+					amountInput.focus();
+				} else {
+					amountInput.value = amount;
+				}
+			}
+
+			function showStatus(message, type) {
+				const statusDiv = document.getElementById('statusMessage');
+				statusDiv.textContent = message;
+				statusDiv.className = `status-message status-${type}`;
+
+				// Auto-hide after 4 seconds
+				setTimeout(() => {
+					statusDiv.textContent = '';
+					statusDiv.className = '';
+				}, 4000);
+			}
+
+			// Banker functions
+			async function createGame() {
+				const gameId = document
+					.getElementById('gameId')
+					.value.trim()
+					.toUpperCase();
+				if (!gameId) {
+					showStatus('Введите ID игры', 'error');
+					return;
+				}
+
+				try {
+					const gameRef = db.collection('games').doc(gameId);
+					const gameDoc = await gameRef.get();
+					const currentUser = db.getCurrentUser();
+					if (!currentUser) {
+						showStatus('Сначала войдите в систему', 'error');
+						return;
+					}
+
+					if (!gameDoc.exists) {
+						// Create new game
+						await gameRef.set({
+							createdAt: new Date().toISOString(),
+							currentTurn: 1,
+							bankerId: currentUser,
+							bankerName: currentUser,
+							players: {},
+							transactions: [],
+						});
+						showStatus('Игра создана!', 'success');
+					} else {
+						showStatus('Подключились к игре', 'info');
+					}
+
+					currentGameId = gameId;
+					document.getElementById('gameControls').classList.remove('hidden');
+
+					// Subscribe to game updates
+					subscribeToGame();
+				} catch (error) {
+					showStatus('Ошибка: ' + (error.message || error), 'error');
+				}
+			}
+
+			async function nextTurn() {
+				if (!currentGameId) {
+					showStatus('Сначала создайте или подключитесь к игре', 'error');
+					return;
+				}
+				const gameRef = db.collection('games').doc(currentGameId);
+				const gameDoc = await gameRef.get();
+				if (!gameDoc.exists) {
+					showStatus('Игра не найдена', 'error');
+					return;
+				}
+
+				const gameData = gameDoc.data();
+				const next = (gameData.currentTurn || 1) + 1;
+				await gameRef.update({ currentTurn: next });
+				showStatus('Переход на следующий ход: ' + next, 'info');
+			}
+
+			async function createTransaction() {
+				if (!currentGameId) {
+					showStatus('Сначала создайте или подключитесь к игре', 'error');
+					return;
+				}
+
+				const playerId = document.getElementById('playerSelect').value;
+				const amount = Number(
+					document.getElementById('transactionAmount').value
+				);
+				const type = document.getElementById('transactionType').value;
+				const reason =
+					document.getElementById('transactionReason').value.trim() ||
+					'Без причины';
+
+				if (!playerId) {
+					showStatus('Выберите игрока', 'error');
+					return;
+				}
+				if (!amount || amount <= 0) {
+					showStatus('Введите корректную сумму', 'error');
+					return;
+				}
+
+				const gameRef = db.collection('games').doc(currentGameId);
+				const gameDoc = await gameRef.get();
+				if (!gameDoc.exists) {
+					showStatus('Игра не найдена', 'error');
+					return;
+				}
+
+				// Create transaction object
+				const code = db.generateShortCode();
+				const tx = {
+					code,
+					playerId,
+					amount,
+					type,
+					reason,
+					createdAt: new Date().toISOString(),
+					applied: false,
+					appliedAt: null,
+					banker: db.getCurrentUser(),
+				};
+
+				// append to transactions
+				const gameData = gameDoc.data();
+				const transactions = Array.isArray(gameData.transactions)
+					? gameData.transactions.slice()
+					: [];
+				transactions.push(tx);
+
+				// save
+				await gameRef.update({ transactions });
+				showStatus('Код создан: ' + code, 'success');
+
+				// show code in UI
+				const qrResult = document.getElementById('qrResult');
+				const qrContainer = document.getElementById('qrCodeContainer');
+				qrContainer.innerHTML = `
+                <div class="transaction-id-display">
+                    <div class="transaction-code">${code}</div>
+                    <div style="color:#111; padding:8px; border-radius:6px; background:#fff; margin-top:8px;">
+                        ${
+													type === 'debit' ? 'Списать' : 'Начислить'
+												} ${amount}₴ — ${reason}
+                    </div>
+                    <div style="margin-top:8px;">
+                        <button class="copy-btn" id="copyCodeBtn">Копировать код</button>
+                    </div>
+                </div>
+            `;
+				qrResult.classList.remove('hidden');
+
+				// attach copy
+				setTimeout(() => {
+					const cbtn = document.getElementById('copyCodeBtn');
+					if (cbtn) {
+						cbtn.addEventListener('click', () => {
+							navigator.clipboard
+								?.writeText(code)
+								.then(() => {
+									showStatus('Код скопирован в буфер обмена', 'success');
+								})
+								.catch(() => {
+									showStatus('Не удалось скопировать код', 'error');
+								});
+						});
+					}
+				}, 10);
+			}
+
+			// Player functions
+			async function joinGame() {
+				const gameId = document
+					.getElementById('playerGameId')
+					.value.trim()
+					.toUpperCase();
+				if (!gameId) {
+					showStatus('Введите ID игры', 'error');
+					return;
+				}
+				const currentUser = db.getCurrentUser();
+				if (!currentUser) {
+					showStatus('Сначала войдите в систему', 'error');
+					return;
+				}
+
+				const gameRef = db.collection('games').doc(gameId);
+				const gameDoc = await gameRef.get();
+				let gameData = gameDoc.exists ? gameDoc.data() : null;
+
+				if (!gameData) {
+					// create minimal game if doesn't exist (player can join)
+					gameData = {
+						createdAt: new Date().toISOString(),
+						currentTurn: 1,
+						bankerId: null,
+						bankerName: null,
+						players: {},
+						transactions: [],
+					};
+					await gameRef.set(gameData);
+				}
+
+				// add player if new
+				if (!gameData.players) gameData.players = {};
+				if (!gameData.players[currentUser]) {
+					gameData.players[currentUser] = {
+						id: currentUser,
+						name: currentUser,
+						balance: 1500,
+						createdAt: new Date().toISOString(),
+						history: [],
+					};
+					await gameRef.update({ players: gameData.players });
+				}
+
+				currentGameId = gameId;
+				document.getElementById('playerControls').classList.remove('hidden');
+				showStatus('Вы присоединились к игре ' + gameId, 'success');
+
+				// subscribe to game updates
+				subscribeToGame();
+			}
+
+			function toggleManualCode() {
+				const manual = document.getElementById('manualCodeContainer');
+				manual.classList.toggle('hidden');
+				if (!manual.classList.contains('hidden')) {
+					document.getElementById('manualCodeInput').focus();
+				}
+			}
+
+			function formatCodeInput(e) {
+				// allow only digits, max length 5
+				const el = e.target;
+				el.value = el.value.replace(/\D/g, '').slice(0, 5);
+			}
+
+			async function processManualCode() {
+				const code = document.getElementById('manualCodeInput').value.trim();
+				if (code.length !== 5) {
+					showStatus('Введите 5-значный код', 'error');
+					return;
+				}
+				if (!currentGameId) {
+					showStatus('Сначала присоединитесь к игре', 'error');
+					return;
+				}
+
+				const gameRef = db.collection('games').doc(currentGameId);
+				const gameDoc = await gameRef.get();
+				if (!gameDoc.exists) {
+					showStatus('Игра не найдена', 'error');
+					return;
+				}
+
+				const gameData = gameDoc.data();
+				const tx = (gameData.transactions || []).find(t => t.code === code);
+				if (!tx) {
+					showStatus('Код не найден', 'error');
+					return;
+				}
+				if (tx.applied) {
+					showStatus('Код уже использован', 'error');
+					return;
+				}
+
+				// check that player matches or banker allowed? Here only target player can apply code
+				const currentUser = db.getCurrentUser();
+				if (tx.playerId !== currentUser) {
+					showStatus('Этот код не предназначен для вас', 'error');
+					return;
+				}
+
+				// prepare confirmation modal
+				lastPreparedTransaction = { ...tx };
+				openModalForTransaction(lastPreparedTransaction);
+			}
+
+			// Modal helpers
+			function openModalForTransaction(tx) {
+				document.getElementById('modalTitle').textContent =
+					'Применить транзакцию';
+				document.getElementById(
+					'modalMessage'
+				).textContent = `Вы уверены, что хотите ${
+					tx.type === 'debit' ? 'списать' : 'начислить'
+				} ${tx.amount}₴?`;
+				document
+					.getElementById('modalTransactionInfo')
+					.classList.remove('hidden');
+				document.getElementById('modalTransactionCode').textContent = tx.code;
+				document.getElementById('modalTransactionDetails').innerHTML = `
+                ${tx.type === 'debit' ? 'Списание' : 'Начисление'} — ${
+					tx.amount
+				}₴<br>
+                Причина: ${tx.reason}<br>
+                Банкир: ${tx.banker || '—'}
+            `;
+				document.getElementById('confirmModal').classList.remove('hidden');
+			}
+
+			function closeModal() {
+				document.getElementById('confirmModal').classList.add('hidden');
+				lastPreparedTransaction = null;
+			}
+
+			async function confirmTransaction() {
+				if (!lastPreparedTransaction) {
+					closeModal();
+					return;
+				}
+				if (!currentGameId) {
+					showStatus('Игра не подключена', 'error');
+					closeModal();
+					return;
+				}
+
+				try {
+					const gameRef = db.collection('games').doc(currentGameId);
+					const gameDoc = await gameRef.get();
+					const gameData = gameDoc.exists ? gameDoc.data() : null;
+					if (!gameData) {
+						showStatus('Игра не найдена', 'error');
+						closeModal();
+						return;
+					}
+
+					const txs = Array.isArray(gameData.transactions)
+						? gameData.transactions.slice()
+						: [];
+					const txIndex = txs.findIndex(
+						t => t.code === lastPreparedTransaction.code
+					);
+					if (txIndex === -1) {
+						showStatus('Транзакция не найдена', 'error');
+						closeModal();
+						return;
+					}
+
+					const tx = txs[txIndex];
+					if (tx.applied) {
+						showStatus('Транзакция уже применена', 'error');
+						closeModal();
+						return;
+					}
+
+					const playerId = tx.playerId;
+					if (!gameData.players || !gameData.players[playerId]) {
+						showStatus('Игрок не найден', 'error');
+						closeModal();
+						return;
+					}
+
+					// apply
+					const players = { ...gameData.players };
+					if (tx.type === 'debit') {
+						players[playerId].balance =
+							Number(players[playerId].balance) - Number(tx.amount);
+					} else {
+						players[playerId].balance =
+							Number(players[playerId].balance) + Number(tx.amount);
+					}
+
+					// clamp to integer
+					players[playerId].balance = Math.round(players[playerId].balance);
+
+					// mark transaction applied
+					txs[txIndex] = {
+						...tx,
+						applied: true,
+						appliedAt: new Date().toISOString(),
+						appliedBy: db.getCurrentUser(),
+					};
+
+					// add history entry to player
+					if (!players[playerId].history) players[playerId].history = [];
+					players[playerId].history.unshift({
+						code: tx.code,
+						amount: tx.amount,
+						type: tx.type,
+						reason: tx.reason,
+						date: new Date().toISOString(),
+						banker: tx.banker || null,
+					});
+
+					// update storage
+					await gameRef.update({ players, transactions: txs });
+
+					showStatus('Транзакция применена', 'success');
+					updatePlayerBalance();
+					updateTransactionHistory();
+				} catch (err) {
+					showStatus('Ошибка применения: ' + (err.message || err), 'error');
+				} finally {
+					closeModal();
+				}
+			}
+
+			// Subscribe to game changes
+			function subscribeToGame() {
+				if (!currentGameId) return;
+				// Unsubscribe previous
+				if (typeof unsubscribeGame === 'function') {
+					unsubscribeGame();
+					unsubscribeGame = null;
+				}
+
+				const gameRef = db.collection('games').doc(currentGameId);
+				unsubscribeGame = gameRef.onSnapshot(snapshot => {
+					if (!snapshot.exists()) {
+						showStatus('Игра удалена или не существует', 'error');
+						return;
+					}
+					const gameData = snapshot.data() || {};
+					// update UI elements that depend on game state
+					document.getElementById('currentTurn').textContent =
+						gameData.currentTurn || 1;
+					document.getElementById('playerCurrentTurn').textContent =
+						gameData.currentTurn || 1;
+
+					// players list
+					updatePlayersList(
+						gameData.players || {},
+						gameData.transactions || []
+					);
+
+					// if player view, update balance and history
+					updatePlayerBalance(gameData.players || {});
+					updateTransactionHistory(
+						gameData.transactions || [],
+						gameData.players || {}
+					);
+				});
+			}
+
+			// Update players list on banker panel
+			function updatePlayersList(players = {}, transactions = []) {
+				const playersList = document.getElementById('playersList');
+				const playerSelect = document.getElementById('playerSelect');
+
+				const keys = Object.keys(players || {});
+				playerSelect.innerHTML = `<option value="">Выберите игрока...</option>`;
+				playersList.innerHTML = '';
+
+				keys.forEach(pid => {
+					const p = players[pid];
+					const item = document.createElement('div');
+					item.className = 'player-item';
+					item.innerHTML = `
+                    <div>
+                        <strong>${p.name}</strong><br><small>${p.balance}₴</small>
+                    </div>
+                    <div style="text-align:right;">
+                        <button class="refresh-btn" onclick="copyPlayerId('${pid}')">ID</button>
+                    </div>
+                `;
+					playersList.appendChild(item);
+
+					const opt = document.createElement('option');
+					opt.value = pid;
+					opt.textContent = `${p.name} — ${p.balance}₴`;
+					playerSelect.appendChild(opt);
+				});
+
+				// annotate players who have pending transactions
+				if (transactions && transactions.length) {
+					const pendingCounts = {};
+					transactions.forEach(t => {
+						if (!t.applied)
+							pendingCounts[t.playerId] = (pendingCounts[t.playerId] || 0) + 1;
+					});
+
+					// add badges in select text (simple)
+					Array.from(playerSelect.options).forEach(opt => {
+						if (opt.value && pendingCounts[opt.value]) {
+							opt.textContent += ` (●${pendingCounts[opt.value]})`;
+						}
+					});
+				}
+			}
+
+			function copyPlayerId(id) {
+				navigator.clipboard
+					?.writeText(id)
+					.then(() => {
+						showStatus('ID игрока скопирован', 'info');
+					})
+					.catch(() => {
+						showStatus('Не удалось скопировать ID', 'error');
+					});
+			}
+
+			// Update player balance in player panel
+			async function updatePlayerBalance(playersData) {
+				if (!currentGameId) return;
+				const currentUser = db.getCurrentUser();
+				if (!currentUser) return;
+
+				const gameRef = db.collection('games').doc(currentGameId);
+				const gameDoc = await gameRef.get();
+				if (!gameDoc.exists) return;
+				const gameData = gameDoc.data();
+
+				const players =
+					playersData && Object.keys(playersData).length
+						? playersData
+						: gameData.players || {};
+				const playerObj = players[currentUser];
+				if (playerObj) {
+					document.getElementById('playerBalance').textContent =
+						playerObj.balance;
+				}
+			}
+
+			// Update transaction history on player panel
+			async function updateTransactionHistory(transactions, playersData) {
+				if (!currentGameId) return;
+				const currentUser = db.getCurrentUser();
+				if (!currentUser) return;
+
+				const gameRef = db.collection('games').doc(currentGameId);
+				const gameDoc = await gameRef.get();
+				if (!gameDoc.exists) return;
+				const gameData = gameDoc.data();
+
+				const txs = Array.isArray(transactions)
+					? transactions.slice()
+					: gameData.transactions || [];
+				const players =
+					playersData && Object.keys(playersData).length
+						? playersData
+						: gameData.players || {};
+
+				// Prefer player's own history if present
+				let history = [];
+				if (
+					players[currentUser] &&
+					Array.isArray(players[currentUser].history)
+				) {
+					history = players[currentUser].history.slice(0, 30);
+				} else {
+					// fallback: filter global transactions
+					history = txs
+						.filter(t => t.playerId === currentUser)
+						.map(t => ({
+							code: t.code,
+							amount: t.amount,
+							type: t.type,
+							reason: t.reason,
+							date: t.appliedAt || t.createdAt,
+							applied: t.applied,
+						}))
+						.slice()
+						.reverse();
+				}
+
+				const container = document.getElementById('transactionHistory');
+				container.innerHTML = '';
+				if (history.length === 0) {
+					container.innerHTML = '<div style="opacity:0.8">Нет операций</div>';
+					return;
+				}
+				history.forEach(h => {
+					const el = document.createElement('div');
+					el.className = 'transaction-item';
+					el.innerHTML = `
+                    <div style="max-width:65%">${
+											h.type === 'debit' ? 'Списание' : 'Зачисление'
+										} ${h.reason || ''}<br><small>${new Date(
+						h.date
+					).toLocaleString()}</small></div>
+                    <div style="text-align:right" class="${
+											h.type === 'credit'
+												? 'amount-positive'
+												: 'amount-negative'
+										}">${h.type === 'credit' ? '+' : '-'}${h.amount}₴</div>
+                `;
+					container.appendChild(el);
+				});
+			}
+		</script>
+	</body>
+</html>
